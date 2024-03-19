@@ -93,7 +93,7 @@ $user=new User();
                             <div class='col-md-3'></div>
                             <div class='col-md-6 well'>
                                 <h4>".$row['roomname']."</h4><hr>
-                                <h6>No of stores: ".$row['no_bed']." ".$row['bedtype']." silo.</h6>
+                                <h6>No of stores: ".checkRooms($user->db,$row['roomname'])." ".$row['bedtype']." silo.</h6>
                                 <h6>Facilities: ".$row['facility']."</h6>
                                 <h6>Price: ".$row['price']." ksh/day.</h6>
                             </div>
@@ -124,7 +124,16 @@ $user=new User();
         }
         
         
-        
+        function checkRooms($conn,$roomname)
+{
+    $checkRoomsQty="select * from room_category where roomname='$roomname'";
+    $checkQuery=mysqli_query($conn,$checkRoomsQty);
+    $rows=mysqli_fetch_assoc($checkQuery);
+    $rooms_qty=$rows['no_bed']; 
+    $checkBookings="select * from bookings where roomname='$roomname'";
+    $count=mysqli_num_rows(mysqli_query($conn,$checkBookings));
+    return $rooms_qty-$count;
+}
         
         
         ?>

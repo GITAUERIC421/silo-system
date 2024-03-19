@@ -98,7 +98,7 @@ if ($result) {
                         <h6>Price: ".$discountedPrice." ksh/day (50% off from ".$originalPrice." ksh  Since it is a Shared Silo Storage).</h6>
                     </div>
                     <div class='col-md-3'>
-                        <a href='./booknow.php?roomname=".$row['roomname']."'><button class='btn btn-primary button'>Book Now</button></a>
+                        <a href='./booknow.php?share=true&&roomname=".$row['roomname']."'><button class='btn btn-primary button'>Book Now</button></a>
                     </div>
                 </div>";
         }

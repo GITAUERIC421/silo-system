@@ -5,7 +5,7 @@
             public $db;
             public function __construct()
             {
-                $this->db=new mysqli(DB_SERVER,DB_USERNAME,DB_PASSWORD,'hotel');
+                $this->db=new mysqli(DB_SERVER,DB_USERNAME,DB_PASSWORD,'silo');
                 if(mysqli_connect_errno())
                 {
                     echo "Error: Could not connect to database.";
@@ -70,40 +70,30 @@
             
             
             
-            public function booknow($checkin, $checkout, $name, $phone,$roomname)
+            public function booknow($checkin, $checkout, $name, $phone, $roomname, $total_price)
             {
-                    
-                    $sql="SELECT * FROM rooms WHERE room_cat='$roomname' AND (room_id NOT IN (SELECT DISTINCT room_id
-   FROM rooms WHERE checkin <= '$checkin' AND checkout >='$checkout'))";
-                    $check= mysqli_query($this->db,$sql)  or die(mysqli_connect_errno()."Data herecannot inserted");;
-                 
-                    if(mysqli_num_rows($check) > 0)
-                    {
-                        $row = mysqli_fetch_array($check);
-                        $id=$row['room_id'];
-                        
-                        $sql2="UPDATE rooms  SET checkin='$checkin', checkout='$checkout', name='$name', phone='$phone', book='true' WHERE room_id=$id";
-                         $send=mysqli_query($this->db,$sql2);
-                        if($send)
-                        {
-                            $result="Your Room has been booked!!";
-                        }
-                        else
-                        {
-                            $result="Sorry, Internel Error";
-                        }
+                $sql = "SELECT * FROM room_category where roomname='$name')";
+                $check = mysqli_query($this->db, $sql) or die(mysqli_connect_errno() . "Data here cannot inserted");
+                $row = mysqli_fetch_array($check);
+                $result=json.encode($row);
+                if ($row['no_bed'] > 0) {
+                    $id = $row['roomname'];
+            
+                    // Insert booking into bookings table
+                    $insert_sql = "INSERT INTO bookings (room_id, checkin, checkout, name, phone, total_price) VALUES ('$id', '$checkin', '$checkout', '$name', '$phone', '$total_price')";
+                    $insert_result = mysqli_query($this->db, $insert_sql);
+            
+                    if ($insert_result) {
+                        $result = "Your Room has been booked!!";
+                    } else {
+                        $result = "Sorry, Internal Error";
                     }
-                    else                       
-                    {
-                        $result = "No Room Is Available";
-                    }
-                    
-                    
-                
-                    return $result;
-                
-
+                } else {
+                    $result = "No Room Is Available";
+                }
+                return $result;
             }
+            
             
             
             

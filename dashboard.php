@@ -20,6 +20,9 @@
    
     
     <style>
+        body{
+            color:yellow;
+        }
         .well
         {
             background: rgba(0,0,0,0.7);
@@ -89,7 +92,73 @@
             <img class="mySlides w3-animate-fading" src="images/p7.jpg" style="width:100%; height:450px;">
         </div>    
         </div>
+        
         <hr>
+        <?php
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'silo');
+$db = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+$sql = "SELECT * FROM room_category";
+$result = mysqli_query($db, $sql);
+
+if ($result && mysqli_num_rows($result) > 0) {
+    $columns_per_row = 3; // Change this value as needed
+
+    // Initialize counter
+    $count = 0;
+
+    // Start row
+    echo "<div class='row'>";
+
+    while ($row = mysqli_fetch_array($result)) {
+        // Start column
+        echo "<div class='col-md-" . (12 / $columns_per_row) . "'>";
+        echo "<div class='well'>";
+        echo "<h4>".$row['roomname']."</h4><hr>";
+        echo "<h6>No of stores: ".checkRooms($db,$row['roomname'])." ".$row['bedtype']." silo.</h6>";
+        echo "<h6>Facilities: ".$row['facility']."</h6>";
+        echo "<h6>Price: ".$row['price']." ksh/day.</h6>";
+        echo "<a href='./booknow.php?roomname=".$row['roomname']."'><button class='btn btn-primary button'>Book Now</button></a>";
+        echo "</div>"; // End of well
+        echo "</div>"; // End of column
+
+        // Increment counter
+        $count++;
+
+        // If the number of columns per row is reached, start a new row
+        if ($count % $columns_per_row == 0) {
+            echo "</div>"; // End of row
+            echo "<div class='row'>"; // Start new row
+        }
+    }
+
+    // Close the last row if the total number of columns is not divisible by the columns per row
+    if ($count % $columns_per_row != 0) {
+        echo "</div>"; // End of row
+    }
+} else {
+    echo "No data exists";
+}
+
+function checkRooms($conn,$roomname) {
+    $checkRoomsQty = "SELECT * FROM room_category WHERE roomname='$roomname'";
+    $checkQuery = mysqli_query($conn,$checkRoomsQty);
+    $rows = mysqli_fetch_assoc($checkQuery);
+    $rooms_qty = $rows['no_bed']; 
+    $checkBookings = "SELECT * FROM bookings WHERE roomname='$roomname'";
+    $count = mysqli_num_rows(mysqli_query($conn,$checkBookings));
+    return $rooms_qty - $count;
+}
+?>
+
+
         <div class="row" style="color: #ed9e21">
             <div class="col-md-12 well" >
               <h4><strong style="color: #ffbb2b">About</strong></h4><br>
@@ -102,6 +171,7 @@
                     monitoring, and managing silo storage spaces.</p>
             </div>  
         </div>
+        
         <div class="row" style="color: #ffbb2b">
             <div class="col-md-4 wellfix">
               <h4><strong>Contact Us</strong></h4><hr>
